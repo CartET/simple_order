@@ -1,0 +1,121 @@
+<link href="{$plugurl}simple_order_style.css" rel="stylesheet" type="text/css" />
+<script type="text/javascript" src="{$plugurl}js/jquery.js"></script>
+{literal}
+<script type="text/javascript">
+$(document).ready(function() {
+	$(".simple_order_submit").click(function()
+	{
+		var so_phone = $("#so_phone"),
+			so_name = $("#so_name"),
+			so_email = $("#so_email"),
+			so_setting_phone = '{/literal}{$smarty.const.SO_PHONE}{literal}',
+			so_setting_name = '{/literal}{$smarty.const.SO_NAME}{literal}',
+			so_setting_email = '{/literal}{$smarty.const.SO_EMAIL}{literal}';
+
+		if (so_phone.val() == '' && so_setting_phone == 'true')
+		{
+			so_phone.addClass("needsfilled");
+		}
+		else if (so_name.val() == '' && so_setting_name == 'true')
+		{
+			so_name.addClass("needsfilled");
+		}
+		else if (so_email.val() == '' && so_setting_email == 'true')
+		{
+			so_email.addClass("needsfilled");
+		}
+		else
+		{
+			$.ajax({
+				type: "POST",
+				url: "{/literal}{$linkAction}{literal}",
+				data: $('#so_form_id').serialize(),
+				dataType: "json",
+				beforeSend: function() {
+					$("#errors").css('display', 'none');
+					$(".errors-div").html('');
+					$("#so-form-inner").css('display', 'none');
+					$("#so-form-loader").css('display', 'block');
+				},
+				success: function(returnData) {
+					if (returnData.errors)
+					{
+						$("#errors").css('display', 'block');
+						$(".errors-div").html(returnData.errors);
+						$("#so-form-loader").css('display', 'none');
+						$("#so-form-inner").css('display', 'block');
+					}
+					else
+					{
+						$("#errors").css('display', 'none');
+						$(".errors-div").html('');
+						$("#so-form-loader").css('display', 'none');
+						$("#so-order-success").css('display', 'block');
+						$("#so-order-success-div").html(returnData);
+					}
+				}
+			});
+		}
+		return false;
+	});
+
+	$(":input").focus(function(){
+		if ($(this).hasClass("needsfilled"))
+		{
+			$(this).removeClass("needsfilled");
+		}
+	})
+});
+</script>
+{/literal}
+
+<h2 class="modal-page-title">{$smarty.const.SO_TITLE} ({$products_name})</h2>
+
+<div class="modal-page-body">
+	<div class="po-body">
+		<div id="so-form-loader" style="display:none;"><div class="so-form-hidden"><h1>{$smarty.const.SO_LOAD}</h1></div></div>
+
+		<div id="so-order-success" style="display:none;">
+			<div id="so-order-success-div"></div>
+		</div>
+
+		<div id="errors" style="display:none;">
+			<div class="errors-div"></div>
+		</div>
+
+		<div id="so-form-inner">
+			<form id="so_form_id" action="{$linkAction}" method="post">
+			<input type="hidden" name="products_id" id="products_id" value="{$products_id}" />
+			<div style="display:none;"><input type="text" name="username" id="username" value="" /></div>
+
+			{if $smarty.const.SO_NAME == 'true'}
+			<div class="so-form-item">
+				<label for="so_name">{$smarty.const.SO_C_NAME}</label>
+				<input type="text" id="so_name" name="so_name" value="{$customerName}" />
+			</div>
+			{/if}
+
+			{if $smarty.const.SO_PHONE == 'true'}
+			<div class="so-form-item">
+				<label for="so_phone">{$smarty.const.SO_C_PHONE}</label>
+				<input type="text" id="so_phone" name="so_phone" value="{$smarty.session.so_customer_info.so_name}" />
+			</div>
+			{/if}
+
+			{if $smarty.const.SO_EMAIL == 'true'}
+			<div class="so-form-item">
+				<label for="so_email">{$smarty.const.SO_C_EMAIL}</label>
+				<input type="text" id="so_email" name="so_email" value="{$smarty.session.so_customer_info.so_email}" />
+			</div>
+			{/if}
+
+			<div style="text-align:center;">
+				<input class="btn btn-default simple_order_submit" type="submit" name="add_simple_order" value="{$smarty.const.SO_SEND}" />
+			</div>
+
+			</form>
+
+			<div class="so-clear"></div>
+		</div>
+	</div>
+</div>

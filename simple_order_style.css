@@ -1,0 +1,27 @@
+.po-body div, .po-body span, .po-body h1, .po-body h2, .po-body p, .po-body a, .po-body img, .po-body ins, .po-body form, .po-body label {margin:0;padding:0;border:0;outline:0;font-size:100%;vertical-align:baseline;background:transparent;}
+
+.po-body :focus {outline:0;}
+.po-body ins {text-decoration:none;}
+.po-body del {text-decoration:line-through;}
+.po-body table {border-collapse:collapse;border-spacing:0;}
+.po-body {margin:0 auto;font: 12px/18px Tahoma, Helvetica, "Helvetica Neue", Verdana, sans-serif;color:#000;}
+
+.preorder-clear {margin:0;padding:0;clear:both;display:block;font-size:0;height:0;line-height:0;}
+
+#preorder-form-inner {width:100%;}
+#preorder-form-inner H1 {font-size:150%;font-weight:normal;color:#0092CC;margin-bottom:5px;}
+#preorder-form-inner H2 {font-size:120%;font-weight:normal;margin-bottom:20px;}
+#preorder-form-inner label {display:block;margin-bottom:3px;}
+#preorder-form-inner .preorder-form-item {color:#585858;margin:0 0 15px 0;}
+#preorder-form-inner .round6-blue {cursor:pointer;border-radius:3px;-webkit-border-radius: 3px;-moz-border-radius: 3px;padding:6px;border:1px solid #8DC8E7;background: #8DC8E7;color: #ffffff;}
+#preorder-form-inner .round6-blue:hover {border:1px solid #ea9a0e;background:#ea9a0e;color:#ffffff;}
+
+.preorder-form-hidden {height:200px;}
+
+#preorder-form-loader H1 {padding:80px 0 0 0;text-align:center;font-size:150%;font-weight:normal;color:#0092CC;}
+#preorder-form-login h5 {padding:70px 0 0 0;text-align:center;font-size:110%;font-weight:normal;color:#0092CC;}
+#preorder-form-ok {text-align:center;}
+#preorder-form-ok H1 {padding:80px 0 0 0;font-size:150%;font-weight:normal;color:#0092CC;}
+
+.needsfilled {background:#ffeae4!important;border:1px solid #ff3c00!important;}
+.errors-div {margin-bottom:15px!important;background:#ffeae4!important;border:1px solid #ff3c00!important;padding:6px 12px!important;}
