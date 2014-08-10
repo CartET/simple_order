@@ -1,9 +1,10 @@
 Уважаемый {$customer_name}!
 Вы сделали заказ в магазине {$smarty.const.STORE_NAME}.
 
-ID заказа: {$order_id}
+ID заказа: {$oID}
 Товар: {$product_name}
-{if $products_shippingtime}Время доставки: {$products_shippingtime}{/if}
+Посмотреть товар: {$product_link}
+{if isset($products_shippingtime)}Время доставки: {$products_shippingtime}{/if}
 {if isset($customer_name)}Покупатель: {$customer_name}{/if}
 {if isset($customer_telephone)} Телефон: {$customer_telephone}{/if}
 {if isset($customer_email)}E-mail: {$customer_email}{/if}

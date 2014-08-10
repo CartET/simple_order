@@ -15,6 +15,8 @@ if ($p->info['simple_order']['status'] == 1)
 	define('SO_NAME', get_option('so_name'));
 	define('SO_PHONE', get_option('so_phone'));
 	define('SO_EMAIL', get_option('so_email'));
+	define('SO_SMS_ADMIN', get_option('so_sms_admin'));
+	define('SO_SMS', get_option('so_sms'));
 }
 
 add_filter('build_products', 'simple_order_products_listing');
@@ -89,4 +91,6 @@ function simple_order_install()
 	add_option('so_name', 'true', 'radio', "array('true', 'false')");
 	add_option('so_phone', 'true', 'radio', "array('true', 'false')");
 	add_option('so_email', 'false', 'radio', "array('true', 'false')");
+	add_option('so_sms_admin', 'false', 'radio', "array('true', 'false')");
+	add_option('so_sms', 'false', 'radio', "array('true', 'false')");
 }

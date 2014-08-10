@@ -432,8 +432,9 @@ if (isset($_SERVER['HTTP_X_REQUESTED_WITH']) && strtolower($_SERVER['HTTP_X_REQU
 		$osTemplate->assign('customer_telephone', $telephone);
 		$osTemplate->assign('customer_email', $email_address);
 		$osTemplate->assign('product_name', $productInfo['products_name']);
+		$osTemplate->assign('product_link', os_href_link(FILENAME_PRODUCT_INFO, os_product_link($productInfo['products_id'], $productInfo['products_name'])));
 		$osTemplate->assign('products_shippingtime', $main->getShippingStatusName($productInfo['products_shippingtime']));
-		$osTemplate->assign('order_id', $newOrderId);
+		$osTemplate->assign('oID', $newOrderId);
 
 		$osTemplate->caching = false;
 		$html_mail = $osTemplate->fetch(dirname(__FILE__).'/mail/'.$_SESSION['language'].'/order_admin.html');
@@ -447,6 +448,32 @@ if (isset($_SERVER['HTTP_X_REQUESTED_WITH']) && strtolower($_SERVER['HTTP_X_REQU
 			$c_txt_mail = $osTemplate->fetch(dirname(__FILE__).'/mail/'.$_SESSION['language'].'/order.txt');
 
 			os_php_mail(EMAIL_BILLING_ADDRESS, EMAIL_BILLING_NAME, $email_address, $cname, '', EMAIL_BILLING_REPLY_ADDRESS, EMAIL_BILLING_REPLY_ADDRESS_NAME, '', '', SO_MAIL_SUBJECT, $c_html_mail, $c_txt_mail);
+		}
+
+		global $cartet;
+
+		// СМС уведомления
+		$smsSetting = $cartet->sms->setting();
+
+		if ($smsSetting['sms_status'] == 1)
+		{
+			$getDefaultSms = $cartet->sms->getDefaultSms();
+
+			// шаблон смс письма
+			$osTemplate->caching = 0;
+			$smsText = $osTemplate->fetch(_MAIL.$_SESSION['language'].'/order_mail_sms.txt');
+
+			// уведомление администратора
+			if ($getDefaultSms['phone'] && SO_SMS_ADMIN == 'true')
+			{
+				$cartet->sms->send($smsText);
+			}
+
+			// уведомление покупателя
+			if ($telephone && SO_SMS == 'true')
+			{
+				$cartet->sms->send($smsText, $telephone);
+			}
 		}
 
 		$data = SO_ORDER_SUCCESS;
