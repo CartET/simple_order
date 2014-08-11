@@ -2,7 +2,7 @@
 /*
 	Plugin Name: Заказ в один клик
 	Plugin URI: http://osc-cms.com/store/plugins/simple-order
-	Version: 1.2
+	Version: 1.3
 	Description: Плагин Заказ в один клик
 	Author: CartET
 	Author URI: http://osc-cms.com
@@ -69,7 +69,8 @@ function simple_order_products_form()
 		if (isset($_SESSION['customer_id']))
 		{
 			$getCustomerData = os_db_query("SELECT * FROM ".TABLE_CUSTOMERS." WHERE customers_id = '".(int)$_SESSION['customer_id']."'");
-			$osTemplate->assign('customerName', $_SESSION['customer_first_name'].' '.$_SESSION['customer_last_name']);
+			$customerData = os_db_fetch_array($getCustomerData);
+			$osTemplate->assign('customerData', $customerData);
 		}
 		else
 			$osTemplate->assign('customerName', $_SESSION['so_customer_info']['so_name']);

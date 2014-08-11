@@ -8,3 +8,4 @@ ID заказа: {$oID}
 {if isset($customer_name)}Покупатель: {$customer_name}{/if}
 {if isset($customer_telephone)} Телефон: {$customer_telephone}{/if}
 {if isset($customer_email)}E-mail: {$customer_email}{/if}
+{if isset($password)}Пароль для входа: {$password}{/if}

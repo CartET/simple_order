@@ -91,21 +91,21 @@ $(document).ready(function() {
 			{if $smarty.const.SO_NAME == 'true'}
 			<div class="so-form-item">
 				<label for="so_name">{$smarty.const.SO_C_NAME}</label>
-				<input type="text" id="so_name" name="so_name" value="{$customerName}" />
+				<input type="text" id="so_name" name="so_name" value="{if isset($customerName)}{$customerName}{else}{$customerData.customers_firstname} {$customerData.customers_lastname}{/if}" />
 			</div>
 			{/if}
 
 			{if $smarty.const.SO_PHONE == 'true'}
 			<div class="so-form-item">
 				<label for="so_phone">{$smarty.const.SO_C_PHONE}</label>
-				<input type="text" id="so_phone" name="so_phone" value="{$smarty.session.so_customer_info.so_name}" />
+				<input type="text" id="so_phone" name="so_phone" value="{if isset($smarty.session.so_customer_info.so_phone)}{$smarty.session.so_customer_info.so_phone}{else}{$customerData.customers_telephone}{/if}" />
 			</div>
 			{/if}
 
 			{if $smarty.const.SO_EMAIL == 'true'}
 			<div class="so-form-item">
 				<label for="so_email">{$smarty.const.SO_C_EMAIL}</label>
-				<input type="text" id="so_email" name="so_email" value="{$smarty.session.so_customer_info.so_email}" />
+				<input type="text" id="so_email" name="so_email" value="{if isset($smarty.session.so_customer_info.so_email)}{$smarty.session.so_customer_info.so_email}{else}{$customerData.customers_email_address}{/if}" />
 			</div>
 			{/if}
 

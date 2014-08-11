@@ -18,6 +18,13 @@ if (isset($_SERVER['HTTP_X_REQUESTED_WITH']) && strtolower($_SERVER['HTTP_X_REQU
 	}
 	else
 	{
+		$customerData = array();
+		if (isset($_SESSION['customer_id']))
+		{
+			$getCustomerData = os_db_query("SELECT * FROM ".TABLE_CUSTOMERS." WHERE customers_id = '".(int)$_SESSION['customer_id']."'");
+			$customerData = os_db_fetch_array($getCustomerData);
+		}
+
 		// некоторые данные покупателя
 		$firstname = ($_SESSION['customer_id']) ? $_SESSION['customer_first_name'] : os_db_prepare_input($_POST['so_name']);
 		$lastname = ($_SESSION['customer_id']) ? $_SESSION['customer_last_name'] : '';
@@ -36,30 +43,34 @@ if (isset($_SERVER['HTTP_X_REQUESTED_WITH']) && strtolower($_SERVER['HTTP_X_REQU
 		$telephone = os_db_prepare_input($_POST['so_phone']);
 		$so_product = (int)$_POST['products_id'];
 		$comment = '';
-		$customers_status = DEFAULT_CUSTOMERS_STATUS_ID;
+		$customers_status = ($customerData['customers_status']) ? $customerData['customers_status'] : DEFAULT_CUSTOMERS_STATUS_ID;
 		$newsletter = 0;
+		$password = os_create_random_value(8);
 
-		if (empty($email_address) && empty($telephone))
+		if (!$_SESSION['customer_id'])
 		{
-			echo json_encode(array('errors' => SO_FORM_ERROR_EMAIL_OR_PHONE));
-			die();
-		}
+			if (empty($email_address) && empty($telephone))
+			{
+				echo json_encode(array('errors' => SO_FORM_ERROR_EMAIL_OR_PHONE));
+				die();
+			}
 
-		if (SO_EMAIL == 'true' && !empty($email_address))
-		{
-			$aCheck[] = "customers_email_address = '".os_db_input($email_address)."'";
-		}
+			if (SO_EMAIL == 'true' && !empty($email_address))
+			{
+				$aCheck[] = "customers_email_address = '".os_db_input($email_address)."'";
+			}
 
-		if (SO_PHONE == 'true' && !empty($telephone))
-		{
-			$aCheck[] = "customers_telephone = '".os_db_input($telephone)."'";
-		}
+			if (SO_PHONE == 'true' && !empty($telephone))
+			{
+				$aCheck[] = "customers_telephone = '".os_db_input($telephone)."'";
+			}
 
-		$check_customer_query = os_db_query("select customers_email_address, customers_telephone from ".TABLE_CUSTOMERS." where (".join(' OR ', $aCheck).") AND account_type = '0'");
-		if (os_db_num_rows($check_customer_query) > 0)
-		{
-			echo json_encode(array('errors' => SO_FORM_ERROR_EMAIL_OR_PHONE_EXISTS));
-			die();
+			$check_customer_query = os_db_query("select customers_email_address, customers_telephone from ".TABLE_CUSTOMERS." where (".join(' OR ', $aCheck).") AND account_type = '0'");
+			if (os_db_num_rows($check_customer_query) > 0)
+			{
+				echo json_encode(array('errors' => SO_FORM_ERROR_EMAIL_OR_PHONE_EXISTS));
+				die();
+			}
 		}
 
 		if (!$_SESSION['customer_id'])
@@ -127,7 +138,9 @@ if (isset($_SERVER['HTTP_X_REQUESTED_WITH']) && strtolower($_SERVER['HTTP_X_REQU
 	/*----------------------------------------------------------------------------*/
 	/*----------------------------------------------------------------------------*/
 	/*----------------------------------------------------------------------------*/
-		
+
+		global $osTemplate, $main;
+
 		// методы оплаты и доставки
 		$modShipping = 'sogl';
 		$modPayment = 'soglas';
@@ -136,21 +149,20 @@ if (isset($_SERVER['HTTP_X_REQUESTED_WITH']) && strtolower($_SERVER['HTTP_X_REQU
 		require (_CLASS.'payment.php');
 		$payment_modules = new payment($modPayment);
 
-		$tmp_status = 1;
+		$tmp_status = DEFAULT_ORDERS_STATUS_ID;
 		$shipping_cost = '';
 		$discount = '0.00';
 		$customers_ip = os_get_ip_address();
-		$getCurrency = 'RUR';
+		$getCurrency = $_SESSION['currency'];
 		$customers_status_show_price_tax = 1;
 		$languages_id = 1;
 		$languages_name = 'ru';
 
-		//require (_CLASS.'price.php');
-		//$osPrice = new osPrice($getCurrency, 2);
-		global $osPrice;
 	/////////////////////////////////////////////////////////////
 	//////////// получаем инфо о товарах
 	/////////////////////////////////////////////////////////////
+
+		global $osPrice;
 
 		$product = new product($so_product);
 		$productInfo = $product->data;
@@ -163,6 +175,8 @@ if (isset($_SERVER['HTTP_X_REQUESTED_WITH']) && strtolower($_SERVER['HTTP_X_REQU
 		$products_price = $osPrice->GetPrice($productInfo['products_id'], true, 1, $productInfo['products_tax_class_id'], $productInfo['products_price'], 1, 0, $productInfo['products_discount_allowed']);
 		$finalPrice = $products_price['price']['plain'];
 
+		$products_shippingtime = $main->getShippingStatusName($productInfo['products_shippingtime']);
+
 		$preorderProducts[] = array(
 			'qty' => 1,
 			'name' => $productInfo['products_name'],
@@ -170,9 +184,9 @@ if (isset($_SERVER['HTTP_X_REQUESTED_WITH']) && strtolower($_SERVER['HTTP_X_REQU
 			'tax_class_id' => $productInfo['products_tax_class_id'],
 			'tax' => '0',
 			'tax_description' => 'Неизвестная налоговая ставка',
-			'price' => $osPrice->Format($finalPrice,false),
-			'final_price' => $osPrice->Format($finalPrice,false),
-			'shipping_time' => '3-4 дня',
+			'price' => $osPrice->Format($finalPrice, false),
+			'final_price' => $osPrice->Format($finalPrice, false),
+			'shipping_time' => $products_shippingtime,
 			'weight' => $productInfo['products_weight'],
 			'id' => $so_product,
 		);
@@ -204,7 +218,7 @@ if (isset($_SERVER['HTTP_X_REQUESTED_WITH']) && strtolower($_SERVER['HTTP_X_REQU
 			'customers_cid' => '',
 			'customers_vat_id' => $vat,
 			'customers_company' => '',
-			'customers_status' => 2,
+			'customers_status' => $customers_status,
 			'customers_status_name' => 'Покупатель',
 			'customers_status_image' => 'customer_status.gif',
 			'customers_status_discount' => $discount,
@@ -250,7 +264,7 @@ if (isset($_SERVER['HTTP_X_REQUESTED_WITH']) && strtolower($_SERVER['HTTP_X_REQU
 			'date_purchased' => 'now()',
 			'orders_status' => $tmp_status,
 			'currency' => $getCurrency,
-			'currency_value' => '1.000000',
+			'currency_value' => $osPrice->currencies[$_SESSION['currency']]['value'],
 			'customers_ip' => $customers_ip,
 			'language' => $languages_name,
 			'comments' => $comment,
@@ -426,15 +440,17 @@ if (isset($_SERVER['HTTP_X_REQUESTED_WITH']) && strtolower($_SERVER['HTTP_X_REQU
 			}
 		}
 
-		global $osTemplate, $main;
-
 		$osTemplate->assign('customer_name', $cname);
 		$osTemplate->assign('customer_telephone', $telephone);
 		$osTemplate->assign('customer_email', $email_address);
 		$osTemplate->assign('product_name', $productInfo['products_name']);
 		$osTemplate->assign('product_link', os_href_link(FILENAME_PRODUCT_INFO, os_product_link($productInfo['products_id'], $productInfo['products_name'])));
-		$osTemplate->assign('products_shippingtime', $main->getShippingStatusName($productInfo['products_shippingtime']));
+		$osTemplate->assign('products_shippingtime', $products_shippingtime);
 		$osTemplate->assign('oID', $newOrderId);
+		if (!$_SESSION['customer_id'])
+		{
+			$osTemplate->assign('password', $password);
+		}
 
 		$osTemplate->caching = false;
 		$html_mail = $osTemplate->fetch(dirname(__FILE__).'/mail/'.$_SESSION['language'].'/order_admin.html');
@@ -450,29 +466,32 @@ if (isset($_SERVER['HTTP_X_REQUESTED_WITH']) && strtolower($_SERVER['HTTP_X_REQU
 			os_php_mail(EMAIL_BILLING_ADDRESS, EMAIL_BILLING_NAME, $email_address, $cname, '', EMAIL_BILLING_REPLY_ADDRESS, EMAIL_BILLING_REPLY_ADDRESS_NAME, '', '', SO_MAIL_SUBJECT, $c_html_mail, $c_txt_mail);
 		}
 
-		global $cartet;
-
-		// СМС уведомления
-		$smsSetting = $cartet->sms->setting();
-
-		if ($smsSetting['sms_status'] == 1)
+		if (SO_SMS_ADMIN == 'true' OR SO_SMS == 'true')
 		{
-			$getDefaultSms = $cartet->sms->getDefaultSms();
+			global $cartet;
 
-			// шаблон смс письма
-			$osTemplate->caching = 0;
-			$smsText = $osTemplate->fetch(_MAIL.$_SESSION['language'].'/order_mail_sms.txt');
+			// СМС уведомления
+			$smsSetting = $cartet->sms->setting();
 
-			// уведомление администратора
-			if ($getDefaultSms['phone'] && SO_SMS_ADMIN == 'true')
+			if ($smsSetting['sms_status'] == 1)
 			{
-				$cartet->sms->send($smsText);
-			}
+				$getDefaultSms = $cartet->sms->getDefaultSms();
 
-			// уведомление покупателя
-			if ($telephone && SO_SMS == 'true')
-			{
-				$cartet->sms->send($smsText, $telephone);
+				// шаблон смс письма
+				$osTemplate->caching = 0;
+				$smsText = $osTemplate->fetch(_MAIL.$_SESSION['language'].'/order_mail_sms.txt');
+
+				// уведомление администратора
+				if ($getDefaultSms['phone'] && SO_SMS_ADMIN == 'true')
+				{
+					$cartet->sms->send($smsText);
+				}
+
+				// уведомление покупателя
+				if ($telephone && SO_SMS == 'true')
+				{
+					$cartet->sms->send($smsText, $telephone);
+				}
 			}
 		}
 
