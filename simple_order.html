@@ -88,6 +88,13 @@ $(document).ready(function() {
 			<input type="hidden" name="products_id" id="products_id" value="{$products_id}" />
 			<div style="display:none;"><input type="text" name="username" id="username" value="" /></div>
 
+			{if $smarty.const.SO_PRODUCT_QTY == 'true'}
+				<div class="so-form-item">
+					<label for="so_product_qty">{$smarty.const.SO_C_PRODUCT_QTY}</label>
+					<input type="text" id="so_product_qty" name="so_product_qty" value="1" />
+				</div>
+			{/if}
+
 			{if $smarty.const.SO_NAME == 'true'}
 			<div class="so-form-item">
 				<label for="so_name">{$smarty.const.SO_C_NAME}</label>

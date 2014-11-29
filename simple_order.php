@@ -2,7 +2,7 @@
 /*
 	Plugin Name: Заказ в один клик
 	Plugin URI: http://osc-cms.com/store/plugins/simple-order
-	Version: 1.3
+	Version: 1.4
 	Description: Плагин Заказ в один клик
 	Author: CartET
 	Author URI: http://osc-cms.com
@@ -17,6 +17,7 @@ if ($p->info['simple_order']['status'] == 1)
 	define('SO_EMAIL', get_option('so_email'));
 	define('SO_SMS_ADMIN', get_option('so_sms_admin'));
 	define('SO_SMS', get_option('so_sms'));
+	define('SO_PRODUCT_QTY', get_option('so_product_qty'));
 }
 
 add_filter('build_products', 'simple_order_products_listing');
@@ -94,4 +95,5 @@ function simple_order_install()
 	add_option('so_email', 'false', 'radio', "array('true', 'false')");
 	add_option('so_sms_admin', 'false', 'radio', "array('true', 'false')");
 	add_option('so_sms', 'false', 'radio', "array('true', 'false')");
+	add_option('so_product_qty', 'false', 'radio', "array('true', 'false')");
 }

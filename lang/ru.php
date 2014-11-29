@@ -14,6 +14,7 @@ define('SO_LOAD', 'Отправляю...');
 define('SO_C_NAME', 'Ваше имя');
 define('SO_C_PHONE', 'Ваш Телефон');
 define('SO_C_EMAIL', 'Ваш Email');
+define('SO_C_PRODUCT_QTY', 'Количество товара');
 define('SO_SEND', 'Отправить');
 
 define('SO_MAIL_SUBJECT', 'Новый заказ в магазине '.STORE_NAME);

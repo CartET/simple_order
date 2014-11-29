@@ -42,6 +42,9 @@ if (isset($_SERVER['HTTP_X_REQUESTED_WITH']) && strtolower($_SERVER['HTTP_X_REQU
 		$country = STORE_COUNTRY;
 		$telephone = os_db_prepare_input($_POST['so_phone']);
 		$so_product = (int)$_POST['products_id'];
+		$get_qty = str_replace('-', '', (int)$_POST['so_product_qty']);
+		$get_qty = ($get_qty > 0) ? $get_qty : 1;
+		$product_qty = (($get_qty > MAX_PRODUCTS_QTY) ? MAX_PRODUCTS_QTY : $get_qty);
 		$comment = '';
 		$customers_status = ($customerData['customers_status']) ? $customerData['customers_status'] : DEFAULT_CUSTOMERS_STATUS_ID;
 		$newsletter = 0;
@@ -173,18 +176,19 @@ if (isset($_SERVER['HTTP_X_REQUESTED_WITH']) && strtolower($_SERVER['HTTP_X_REQU
 
 		//$finalPrice = $osPrice->Format($productInfo['products_price'], false);
 		$products_price = $osPrice->GetPrice($productInfo['products_id'], true, 1, $productInfo['products_tax_class_id'], $productInfo['products_price'], 1, 0, $productInfo['products_discount_allowed']);
-		$finalPrice = $products_price['price']['plain'];
+		$pPrice = $products_price['price']['plain'];
+		$finalPrice = $products_price['price']['plain']*$product_qty;
 
 		$products_shippingtime = $main->getShippingStatusName($productInfo['products_shippingtime']);
 
 		$preorderProducts[] = array(
-			'qty' => 1,
+			'qty' => $product_qty,
 			'name' => $productInfo['products_name'],
 			'model' => $productInfo['products_model'],
 			'tax_class_id' => $productInfo['products_tax_class_id'],
 			'tax' => '0',
 			'tax_description' => 'Неизвестная налоговая ставка',
-			'price' => $osPrice->Format($finalPrice, false),
+			'price' => $osPrice->Format($pPrice, false),
 			'final_price' => $osPrice->Format($finalPrice, false),
 			'shipping_time' => $products_shippingtime,
 			'weight' => $productInfo['products_weight'],
@@ -499,4 +503,10 @@ if (isset($_SERVER['HTTP_X_REQUESTED_WITH']) && strtolower($_SERVER['HTTP_X_REQU
 		echo json_encode($data);
 		die();
 	}
+}
+else
+{
+	$data = 'Error';
+	echo json_encode($data);
+	die();
 }
