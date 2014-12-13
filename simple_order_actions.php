@@ -175,7 +175,7 @@ if (isset($_SERVER['HTTP_X_REQUESTED_WITH']) && strtolower($_SERVER['HTTP_X_REQU
 		$productsId = array();
 
 		//$finalPrice = $osPrice->Format($productInfo['products_price'], false);
-		$products_price = $osPrice->GetPrice($productInfo['products_id'], true, 1, $productInfo['products_tax_class_id'], $productInfo['products_price'], 1, 0, $productInfo['products_discount_allowed']);
+		$products_price = $osPrice->GetPrice($productInfo['products_id'], true, $product_qty, $productInfo['products_tax_class_id'], $productInfo['products_price'], 1, 0, $productInfo['products_discount_allowed']);
 		$pPrice = $products_price['price']['plain'];
 		$finalPrice = $products_price['price']['plain']*$product_qty;
 
@@ -448,6 +448,8 @@ if (isset($_SERVER['HTTP_X_REQUESTED_WITH']) && strtolower($_SERVER['HTTP_X_REQU
 		$osTemplate->assign('customer_telephone', $telephone);
 		$osTemplate->assign('customer_email', $email_address);
 		$osTemplate->assign('product_name', $productInfo['products_name']);
+		$osTemplate->assign('product_qty', $product_qty);
+		$osTemplate->assign('products_total', $productsPrice);
 		$osTemplate->assign('product_link', os_href_link(FILENAME_PRODUCT_INFO, os_product_link($productInfo['products_id'], $productInfo['products_name'])));
 		$osTemplate->assign('products_shippingtime', $products_shippingtime);
 		$osTemplate->assign('oID', $newOrderId);
