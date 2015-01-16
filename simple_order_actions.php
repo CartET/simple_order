@@ -201,7 +201,7 @@ if (isset($_SERVER['HTTP_X_REQUESTED_WITH']) && strtolower($_SERVER['HTTP_X_REQU
 		// цена товара + количество + атрибуты
 		$productsPriceTotal = $finalPrice+$shipping_cost;
 		// с валютой
-		$productsPrice = $osPrice->Format($productsPriceTotal,true);
+		$productsPrice = $osPrice->Format($productsPriceTotal,true).' '.$_SESSION['currencySymbol'];
 
 	/////////////////////////////////////////////////////////////
 	//////////// формирование заказа
@@ -292,7 +292,7 @@ if (isset($_SERVER['HTTP_X_REQUESTED_WITH']) && strtolower($_SERVER['HTTP_X_REQU
 			array(
 				'code' => 'ot_shipping',
 				'title' => 'По согласованию (По согласованию с администрацией):',
-				'text' =>  $osPrice->Format($shipping_cost,true),
+				'text' =>  $osPrice->Format($shipping_cost, true),
 				'value' => $shipping_cost,
 				'sort_order' => '30',
 			),

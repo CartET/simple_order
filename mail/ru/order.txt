@@ -3,7 +3,7 @@
 
 ID заказа: {$oID}
 Товар: {$product_name} (кол. {$product_qty})
-На сумму: {$products_total} {$smarty.session.currencySymbol}
+На сумму: {$products_total}
 Посмотреть товар: {$product_link}
 {if isset($products_shippingtime)}Время доставки: {$products_shippingtime}{/if}
 {if isset($customer_name)}Покупатель: {$customer_name}{/if}
