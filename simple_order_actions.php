@@ -213,6 +213,8 @@ if (isset($_SERVER['HTTP_X_REQUESTED_WITH']) && strtolower($_SERVER['HTTP_X_REQU
 			$countries_values = os_db_fetch_array($countries);
 		}
 
+		global $html_referer;
+
 		$sql_data_array = array(
 			'customers_id' => $customers_id,
 			'customers_name' => $cname,
@@ -272,8 +274,8 @@ if (isset($_SERVER['HTTP_X_REQUESTED_WITH']) && strtolower($_SERVER['HTTP_X_REQU
 			'customers_ip' => $customers_ip,
 			'language' => $languages_name,
 			'comments' => $comment,
-			'orig_reference' => '',
-			'login_reference' => ''
+			'orig_reference' => $html_referer,
+			'login_reference' => $html_referer
 		);
 		os_db_perform(TABLE_ORDERS, $sql_data_array);
 		$newOrderId = os_db_insert_id();
